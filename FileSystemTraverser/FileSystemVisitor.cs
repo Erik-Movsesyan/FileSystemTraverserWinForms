@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FileSystemTraverser
@@ -12,17 +13,26 @@ namespace FileSystemTraverser
         {
             var dirInfo = new DirectoryInfo(folderPath);
 
-            var entries = dirInfo.EnumerateFileSystemInfos();
-                
-            foreach (var item in entries)
+            var entries = dirInfo.GetFileSystemInfos();
+            var tempArray = new FileSystemEntry[entries.Length];
+
+            for (int i = 0; i < entries.Length; i++)
             {
-                if (!File.Exists(item.FullName))
+                var entry = entries[i];
+                var isFile = File.Exists(entry.FullName);
+                if (!isFile)
                 {
-                    TraverseFileSystemEntries(item.FullName);
+                    TraverseFileSystemEntries(entry.FullName);
                 }
 
-                collectionOfEntries.Add(item.ToFileSystemEntry());
+                tempArray[i] = entry.ToFileSystemEntry(isFile);
             }
+
+            var tempArrayExistingFileSystemEntries = _fileSystemEntries;
+            _fileSystemEntries = new FileSystemEntry[tempArray.Length + tempArrayExistingFileSystemEntries.Length];
+
+            Array.Copy(tempArrayExistingFileSystemEntries, _fileSystemEntries, tempArrayExistingFileSystemEntries.Length);
+            Array.Copy(tempArray, 0, _fileSystemEntries, tempArrayExistingFileSystemEntries.Length, tempArray.Length);
         }
     }
 

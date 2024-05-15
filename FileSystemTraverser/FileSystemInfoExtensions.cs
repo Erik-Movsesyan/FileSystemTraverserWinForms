@@ -18,9 +18,8 @@ namespace FileSystemTraverser
             return fileSystemEntries;
         }
 
-        public static FileSystemEntry ToFileSystemEntry(this FileSystemInfo entry)
+        public static FileSystemEntry ToFileSystemEntry(this FileSystemInfo entry, bool isFile)
         {
-            var isFile = entry.Attributes.HasFlag(FileAttributes.Archive) && !string.IsNullOrEmpty(entry.Extension);
             var fileSystemEntry = new FileSystemEntry(entry.Name, isFile, entry.FullName);
             
             return fileSystemEntry;
