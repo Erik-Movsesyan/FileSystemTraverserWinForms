@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using FileSystemTraverser.Entities;
+using FileSystemTraverser.Enumerators;
+using FileSystemTraverser.Extensions;
 
 namespace FileSystemTraverser
 {
-    public class FileSystemVisitor
+    public class FileSystemVisitor : IEnumerable<FileSystemEntry>
     {
-        private FileSystemEntry[] _fileSystemEntries = [];
-        private List<FileSystemEntry> collectionOfEntries = [];
+        private FileSystemEntry[] _fileSystemEntries  = [];
 
         public void TraverseFileSystemEntries(string folderPath)
         {
@@ -34,87 +37,15 @@ namespace FileSystemTraverser
             Array.Copy(tempArrayExistingFileSystemEntries, _fileSystemEntries, tempArrayExistingFileSystemEntries.Length);
             Array.Copy(tempArray, 0, _fileSystemEntries, tempArrayExistingFileSystemEntries.Length, tempArray.Length);
         }
+
+        public IEnumerator<FileSystemEntry> GetEnumerator()
+        {
+            return new FieSystemEntryEnumerator(_fileSystemEntries);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
-
-    public class FileSystemEntry(string name, bool isFile, string path)
-    {
-        public string Name { get; } = name;
-        public bool IsFile { get; } = isFile;
-        public string Path { get; } = path;
-    }
-
-    //public class People : IEnumerable
-    //{
-    //    private Person[] _people;
-    //    public People(Person[] pArray)
-    //    {
-    //        _people = new Person[pArray.Length];
-
-    //        for (int i = 0; i < pArray.Length; i++)
-    //        {
-    //            _people[i] = pArray[i];
-    //        }
-    //    }
-
-    //    IEnumerator IEnumerable.GetEnumerator()
-    //    {
-    //        return (IEnumerator)GetEnumerator();
-    //    }
-
-    //    public PeopleEnum GetEnumerator()
-    //    {
-    //        return new PeopleEnum(_people);
-    //    }
-    //}
-
-    //public class PeopleEnum : IEnumerator<Person>
-    //{
-    //    public Person[] _people;
-
-    //    // Enumerators are positioned before the first element
-    //    // until the first MoveNext() call.
-    //    int position = -1;
-
-    //    public PeopleEnum(Person[] list)
-    //    {
-    //        _people = list;
-    //    }
-
-    //    public bool MoveNext()
-    //    {
-    //        position++;
-    //        return (position < _people.Length);
-    //    }
-
-    //    public void Reset()
-    //    {
-    //        position = -1;
-    //    }
-
-    //    object IEnumerator.Current
-    //    {
-    //        get
-    //        {
-    //            return Current;
-    //        }
-    //    }
-
-    //    public Person Current
-    //    {
-    //        get
-    //        {
-    //            try
-    //            {
-    //                return _people[position];
-    //            }
-    //            catch (IndexOutOfRangeException)
-    //            {
-    //                throw new InvalidOperationException();
-    //            }
-    //        }
-    //    }
-
-    //    public void Dispose() { }
-    //}
-
 }
