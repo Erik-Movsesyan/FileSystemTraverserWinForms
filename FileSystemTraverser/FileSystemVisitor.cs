@@ -14,24 +14,31 @@ namespace FileSystemTraverser
         public event EventHandler FileSystemSearchStared;
         public event EventHandler FileSystemSearchCompleted;
         private FileSystemEntry[] _fileSystemEntries  = [];
-        private readonly Predicate<string> _filteringByNamePredicate;
-
-        public FileSystemVisitor(Predicate<string> fileFolderNameFilter = null)
-        {
-            if (fileFolderNameFilter is null)
-                return;
-
-            _filteringByNamePredicate = fileFolderNameFilter;
-        }
+        private Predicate<string> _currentFilteringPredicate;
 
         public async Task StartFileSystemSearch(string folderPath)
         {
             OnFileSystemSearchStartedEvent(EventArgs.Empty);
 
-            //add a small delay so the UI can update raise the handlers of the above event
+            //add a small delay so the UI can update while raising the handlers of the above event
             await Task.Delay(TimeSpan.FromMilliseconds(100));
 
             await TraverseFileSystemEntries(folderPath);
+            OnFileSystemSearchCompletedEvent(EventArgs.Empty);
+        }
+
+        public async Task StartFilteredFileSystemSearch(string folderPath, string filter)
+        {
+            OnFileSystemSearchStartedEvent(EventArgs.Empty);
+
+            //add a small delay so the UI can update while raising the handlers of the above event
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+
+            await TraverseFileSystemEntries(folderPath);
+            _currentFilteringPredicate = (fileFolderName)=> fileFolderName.Contains(filter);
+
+            await Task.Run(FilterResults);
+
             OnFileSystemSearchCompletedEvent(EventArgs.Empty);
         }
 
@@ -55,6 +62,7 @@ namespace FileSystemTraverser
             }
 
             var tempArrayExistingFileSystemEntries = _fileSystemEntries;
+            //_fileSystemEntries = null;
             _fileSystemEntries = new FileSystemEntry[tempArray.Length + tempArrayExistingFileSystemEntries.Length];
 
             Array.Copy(tempArrayExistingFileSystemEntries, _fileSystemEntries, tempArrayExistingFileSystemEntries.Length);
@@ -63,7 +71,7 @@ namespace FileSystemTraverser
 
         private void FilterResults()
         {
-            if (_filteringByNamePredicate is null)
+            if (_currentFilteringPredicate is null)
                 return;
 
             var filteredArray = new FileSystemEntry[_fileSystemEntries.Length];
@@ -71,15 +79,15 @@ namespace FileSystemTraverser
             for (int i = 0; i < _fileSystemEntries.Length; i++)
             {
                 var entry = _fileSystemEntries[i];
-                if (_filteringByNamePredicate(entry.Name))
+                if (_currentFilteringPredicate(entry.Name))
                 {
                     filteredArray[filtrationPassedEntries] = entry;
                     filtrationPassedEntries++;
                 }
             }
 
-            var filteredArrayWithoutNulls = new FileSystemEntry[filtrationPassedEntries];
-            Array.Copy(filteredArray, filteredArrayWithoutNulls, filtrationPassedEntries);
+            _fileSystemEntries = new FileSystemEntry[filtrationPassedEntries];
+            Array.Copy(filteredArray, _fileSystemEntries, filtrationPassedEntries);
         }
 
         protected void OnFileSystemSearchStartedEvent(EventArgs e)

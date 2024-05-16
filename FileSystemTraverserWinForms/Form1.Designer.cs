@@ -72,7 +72,6 @@
             listBox.Name = "listBox";
             listBox.Size = new Size(668, 508);
             listBox.TabIndex = 3;
-            listBox.SelectedIndexChanged += listBox_SelectedIndexChanged;
             // 
             // resultsForLabel
             // 
@@ -119,16 +118,19 @@
             filterTextBox.PlaceholderText = "Found files and folders should contain text?";
             filterTextBox.Size = new Size(394, 34);
             filterTextBox.TabIndex = 7;
+            filterTextBox.TextChanged += filterTextBox_TextChanged;
             // 
             // applyFilterCheckbox
             // 
             applyFilterCheckbox.AutoSize = true;
+            applyFilterCheckbox.Enabled = false;
             applyFilterCheckbox.Location = new Point(490, 140);
             applyFilterCheckbox.Name = "applyFilterCheckbox";
             applyFilterCheckbox.Size = new Size(139, 32);
             applyFilterCheckbox.TabIndex = 8;
             applyFilterCheckbox.Text = "Apply Filter";
             applyFilterCheckbox.UseVisualStyleBackColor = true;
+            applyFilterCheckbox.CheckedChanged += applyFilterCheckbox_CheckedChanged;
             // 
             // filterTextBoxValidationBox
             // 

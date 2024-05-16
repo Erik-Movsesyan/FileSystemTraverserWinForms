@@ -5,8 +5,10 @@ namespace FileSystemTraverserWinForms
     public partial class MainForm : Form
     {
         private string _currentFolderToSearchText;
+        private string _currentFilterText;
         private string _lastFolderToSearchTextWithResultsRetrieved;
-        private FileSystemVisitor _fileSystemVisitor;
+        private string _lastFilterTextWithResultsRetrieved;
+        private readonly FileSystemVisitor _fileSystemVisitor;
 
         public MainForm()
         {
@@ -19,7 +21,7 @@ namespace FileSystemTraverserWinForms
         private async void searchButton_Click(object sender, EventArgs e)
         {
             var folderToSearchText = folderToSearchBox.Text;
-            if (!ValidateFolderToSearch(folderToSearchText))
+            if (!ValidateFolderToSearchBox(folderToSearchText))
                 return;
 
             ShowResultsForTextBox();
@@ -27,7 +29,16 @@ namespace FileSystemTraverserWinForms
             listBox.Items.Clear();
             searchButton.Enabled = false;
 
-            await _fileSystemVisitor.StartFileSystemSearch(folderToSearchText);
+            if (!applyFilterCheckbox.Checked)
+            {
+                await _fileSystemVisitor.StartFileSystemSearch(folderToSearchText);
+            }
+            else
+            {
+                applyFilterCheckbox.Enabled = false;
+                await _fileSystemVisitor.StartFilteredFileSystemSearch(folderToSearchText, _currentFilterText);
+                _lastFilterTextWithResultsRetrieved = _currentFilterText;
+            }
             _lastFolderToSearchTextWithResultsRetrieved = folderToSearchText;
 
             await Task.Run(() =>
@@ -39,28 +50,19 @@ namespace FileSystemTraverserWinForms
             });
         }
 
-        private void folderToSearchBox_TextChanged(object sender, EventArgs e)
-        {
-            EnableSearchButton();
-        }
-
         private void EnableSearchButton()
         {
             searchButton.Enabled = !string.IsNullOrWhiteSpace(folderToSearchBox.Text)
-                && _currentFolderToSearchText != folderToSearchBox.Text
-                && (_lastFolderToSearchTextWithResultsRetrieved == null || folderToSearchBox.Text != _lastFolderToSearchTextWithResultsRetrieved);
+                && ((_currentFolderToSearchText != folderToSearchBox.Text
+                && (_lastFolderToSearchTextWithResultsRetrieved == null || folderToSearchBox.Text != _lastFolderToSearchTextWithResultsRetrieved))
+                    || (_lastFilterTextWithResultsRetrieved == null || filterTextBox.Text != _lastFilterTextWithResultsRetrieved));
 
             _currentFolderToSearchText = folderToSearchBox.Text;
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void EnableApplyFilterCheckbox()
         {
-
-        }
-
-        private void listBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
+            applyFilterCheckbox.Enabled = !string.IsNullOrWhiteSpace(filterTextBox.Text);
         }
 
         private void ShowResultsForTextBox()
@@ -70,7 +72,7 @@ namespace FileSystemTraverserWinForms
             resultsForLabel.Visible = true;
         }
 
-        private bool ValidateFolderToSearch(string folderToSearch)
+        private bool ValidateFolderToSearchBox(string folderToSearch)
         {
             folderToSearchValidationMessageBox.Text = string.Empty;
 
@@ -96,6 +98,24 @@ namespace FileSystemTraverserWinForms
         void HandleFileSystemSearchCompleted(object sender, EventArgs e)
         {
             toolStripStatusLabel.Text = ($"FileSystemSearch COMPLETED at {DateTime.Now:MM/dd/yyyThh:mm:ss.ffffff}");
+        }
+
+        private void folderToSearchBox_TextChanged(object sender, EventArgs e)
+        {
+            EnableSearchButton();
+            EnableApplyFilterCheckbox();/////
+        }
+
+        private void filterTextBox_TextChanged(object sender, EventArgs e)
+        {
+            _currentFilterText = filterTextBox.Text;
+            EnableApplyFilterCheckbox();
+            EnableSearchButton();
+        }
+
+        private void applyFilterCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            EnableSearchButton();
         }
     }
 }
