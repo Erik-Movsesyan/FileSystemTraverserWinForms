@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemTraverser", "FileSystemTraverser\FileSystemTraverser.csproj", "{C5EEF2D0-5847-4A6C-A83B-21BD299C4EDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSystemTraverser", "FileSystemTraverser\FileSystemTraverser.csproj", "{C5EEF2D0-5847-4A6C-A83B-21BD299C4EDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemTraverserWinForms", "FileSystemTraverserWinForms\FileSystemTraverserWinForms.csproj", "{55E286ED-5641-4B11-BA22-B79E1C04A1D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSystemTraverserWinForms", "FileSystemTraverserWinForms\FileSystemTraverserWinForms.csproj", "{55E286ED-5641-4B11-BA22-B79E1C04A1D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemTraverser.Tests", "FileSystemTraverser.Tests\FileSystemTraverser.Tests.csproj", "{B784D8BC-A491-4314-8CB5-14EDFE7FE192}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{55E286ED-5641-4B11-BA22-B79E1C04A1D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55E286ED-5641-4B11-BA22-B79E1C04A1D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55E286ED-5641-4B11-BA22-B79E1C04A1D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B784D8BC-A491-4314-8CB5-14EDFE7FE192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B784D8BC-A491-4314-8CB5-14EDFE7FE192}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B784D8BC-A491-4314-8CB5-14EDFE7FE192}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B784D8BC-A491-4314-8CB5-14EDFE7FE192}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

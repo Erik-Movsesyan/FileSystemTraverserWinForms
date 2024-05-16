@@ -1,3 +1,6 @@
+using System;
+using System.Windows.Forms;
+
 namespace FileSystemTraverserWinForms
 {
     internal static class Program

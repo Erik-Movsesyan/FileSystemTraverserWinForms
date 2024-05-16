@@ -1,4 +1,8 @@
-﻿namespace FileSystemTraverserWinForms
+﻿using FileSystemTraverser.Core;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace FileSystemTraverserWinForms
 {
     partial class MainForm
     {
@@ -38,6 +42,7 @@
             filterTextBox = new TextBox();
             applyFilterCheckbox = new CheckBox();
             filterTextBoxValidationBox = new Label();
+            abortSearchButton = new Button();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -47,43 +52,45 @@
             folderToSearchBox.Multiline = true;
             folderToSearchBox.Name = "folderToSearchBox";
             folderToSearchBox.PlaceholderText = "Which folder do you want to search?";
-            folderToSearchBox.Size = new Size(538, 41);
+            folderToSearchBox.Size = new Size(746, 41);
             folderToSearchBox.TabIndex = 1;
             folderToSearchBox.TabStop = false;
             folderToSearchBox.WordWrap = false;
-            folderToSearchBox.TextChanged += folderToSearchBox_TextChanged;
+            folderToSearchBox.TextChanged += HandleFolderToSearchBoxTextChanged;
             // 
             // searchButton
             // 
             searchButton.Enabled = false;
-            searchButton.Location = new Point(642, 65);
+            searchButton.Location = new Point(855, 65);
             searchButton.Name = "searchButton";
             searchButton.Size = new Size(112, 41);
             searchButton.TabIndex = 2;
             searchButton.Text = "Search";
             searchButton.UseVisualStyleBackColor = true;
-            searchButton.Click += searchButton_Click;
+            searchButton.Click += HandleSearchButtonClick;
             // 
             // listBox
             // 
             listBox.FormattingEnabled = true;
+            listBox.HorizontalScrollbar = true;
             listBox.ItemHeight = 28;
             listBox.Location = new Point(86, 240);
             listBox.Name = "listBox";
-            listBox.Size = new Size(668, 508);
+            listBox.SelectionMode = SelectionMode.MultiExtended;
+            listBox.Size = new Size(881, 508);
             listBox.TabIndex = 3;
+            listBox.MouseUp += HandleListBoxMouseUp;
             // 
             // resultsForLabel
             // 
             resultsForLabel.AutoEllipsis = true;
             resultsForLabel.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             resultsForLabel.Location = new Point(86, 187);
-            resultsForLabel.MaximumSize = new Size(668, 50);
+            resultsForLabel.MaximumSize = new Size(881, 50);
             resultsForLabel.Name = "resultsForLabel";
-            resultsForLabel.Size = new Size(668, 50);
+            resultsForLabel.Size = new Size(881, 50);
             resultsForLabel.TabIndex = 4;
             resultsForLabel.TextAlign = ContentAlignment.BottomLeft;
-            resultsForLabel.Visible = false;
             // 
             // folderToSearchValidationMessageBox
             // 
@@ -93,7 +100,7 @@
             folderToSearchValidationMessageBox.ForeColor = Color.Red;
             folderToSearchValidationMessageBox.Location = new Point(86, 40);
             folderToSearchValidationMessageBox.Name = "folderToSearchValidationMessageBox";
-            folderToSearchValidationMessageBox.Size = new Size(538, 22);
+            folderToSearchValidationMessageBox.Size = new Size(746, 22);
             folderToSearchValidationMessageBox.TabIndex = 5;
             // 
             // statusStrip1
@@ -102,7 +109,7 @@
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
             statusStrip1.Location = new Point(0, 811);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(856, 22);
+            statusStrip1.Size = new Size(1063, 22);
             statusStrip1.TabIndex = 6;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -116,21 +123,21 @@
             filterTextBox.Location = new Point(86, 138);
             filterTextBox.Name = "filterTextBox";
             filterTextBox.PlaceholderText = "Found files and folders should contain text?";
-            filterTextBox.Size = new Size(394, 34);
+            filterTextBox.Size = new Size(441, 34);
             filterTextBox.TabIndex = 7;
-            filterTextBox.TextChanged += filterTextBox_TextChanged;
+            filterTextBox.TextChanged += HandleFilterBoxTextChanged;
             // 
             // applyFilterCheckbox
             // 
             applyFilterCheckbox.AutoSize = true;
             applyFilterCheckbox.Enabled = false;
-            applyFilterCheckbox.Location = new Point(490, 140);
+            applyFilterCheckbox.Location = new Point(549, 140);
             applyFilterCheckbox.Name = "applyFilterCheckbox";
             applyFilterCheckbox.Size = new Size(139, 32);
             applyFilterCheckbox.TabIndex = 8;
             applyFilterCheckbox.Text = "Apply Filter";
             applyFilterCheckbox.UseVisualStyleBackColor = true;
-            applyFilterCheckbox.CheckedChanged += applyFilterCheckbox_CheckedChanged;
+            applyFilterCheckbox.CheckedChanged += HandleApplyFilterCheckboxStateChanged;
             // 
             // filterTextBoxValidationBox
             // 
@@ -143,11 +150,23 @@
             filterTextBoxValidationBox.TabIndex = 9;
             filterTextBoxValidationBox.TextAlign = ContentAlignment.BottomLeft;
             // 
+            // abortSearchButton
+            // 
+            abortSearchButton.Enabled = false;
+            abortSearchButton.Location = new Point(802, 138);
+            abortSearchButton.Name = "abortSearchButton";
+            abortSearchButton.Size = new Size(165, 41);
+            abortSearchButton.TabIndex = 10;
+            abortSearchButton.Text = "Abort search";
+            abortSearchButton.UseVisualStyleBackColor = true;
+            abortSearchButton.Click += HandleAbortSearchButtonClick;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(11F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(856, 833);
+            ClientSize = new Size(1063, 833);
+            Controls.Add(abortSearchButton);
             Controls.Add(filterTextBoxValidationBox);
             Controls.Add(applyFilterCheckbox);
             Controls.Add(filterTextBox);
@@ -179,5 +198,6 @@
         private TextBox filterTextBox;
         private CheckBox applyFilterCheckbox;
         private Label filterTextBoxValidationBox;
+        private Button abortSearchButton;
     }
 }
