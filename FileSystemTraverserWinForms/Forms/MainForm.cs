@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
@@ -19,56 +19,13 @@ namespace FileSystemTraverserWinForms
         private string _lastFilterTextWithResultsRetrieved;
         private bool _lastApplyFilterCheckBoxStateWithResultsRetrieved;
 
-        private CancellationTokenSource _cancellationTokenSource;
+        private readonly Dictionary<TreeNodeCollection, CancellationTokenSource> _nodeCollectionCancellationTokens = [];
         private readonly FileSystemVisitor _fileSystemVisitor;
 
         public MainForm()
         {
             InitializeComponent();
             _fileSystemVisitor = new FileSystemVisitor();
-        }
-
-        private async void HandleSearchButtonClick(object sender, EventArgs e)
-        {
-            if (!ValidateFolderToSearchBox(_currentFolderToSearchText))
-                return;
-
-            listBox.Items.Clear();
-            searchButton.Enabled = false;
-
-            _cancellationTokenSource = new CancellationTokenSource();
-            var cancellationToken = _cancellationTokenSource.Token;
-
-            AddRemoveSearchStatusRelatedHandlers(add: true);
-
-            if (!applyFilterCheckbox.Checked || IsFilterTextBoxEmpty)
-            {
-                _fileSystemVisitor.FileFound += HandleFileFound;
-                _fileSystemVisitor.DirectoryFound += HandleDirectoryFound;
-
-                await _fileSystemVisitor.StartFileSystemSearch(_currentFolderToSearchText, cancellationToken);
-
-                _fileSystemVisitor.FileFound -= HandleFileFound;
-                _fileSystemVisitor.DirectoryFound -= HandleDirectoryFound;
-            }
-            else
-            {
-                _fileSystemVisitor.FilteredFileFound += HandleFilteredFileFound;
-                _fileSystemVisitor.FilteredDirectoryFound += HandleFilteredDirectoryFound;
-
-                applyFilterCheckbox.Enabled = false;
-                await _fileSystemVisitor.StartFilteredFileSystemSearch(_currentFolderToSearchText, _currentFilterText, cancellationToken);
-
-                _fileSystemVisitor.FilteredFileFound -= HandleFilteredFileFound;
-                _fileSystemVisitor.FilteredDirectoryFound -= HandleFilteredDirectoryFound;
-
-                _lastFilterTextWithResultsRetrieved = _currentFilterText;
-            }
-
-            AddRemoveSearchStatusRelatedHandlers(add: false);
-
-            _lastApplyFilterCheckBoxStateWithResultsRetrieved = applyFilterCheckbox.Checked;
-            _lastFolderToSearchTextWithResultsRetrieved = _currentFolderToSearchText;
         }
 
         //this mechanism of checking if the search button should be enabled or not allows to keep the button disabled
@@ -106,18 +63,31 @@ namespace FileSystemTraverserWinForms
 
         private void UpdateResultsForTextBox()
         {
-            if (InvokeRequired)
+            if (string.IsNullOrEmpty(resultsForLabel.Text))
+                resultsForLabel.Text = $"Results for: {_currentFolderToSearchText}";
+        }
+
+        private void AddRemoveBrowseSearchStatusRelatedHandlers(bool add)
+        {
+            if (add)
             {
-                Invoke(UpdateResultsForTextBox);
+                _fileSystemVisitor.FileSystemSearchStarted += HandleFileSystemSearchStartedTriggeredByBrowseButton;
+                _fileSystemVisitor.FileSystemSearchStarted += HandleFileSystemSearchStarted;
+                _fileSystemVisitor.FileSystemSearchCompleted += HandleFileSystemSearchCompletedTriggeredByBrowseButton;
+                _fileSystemVisitor.FileSystemSearchCompleted += HandleFileSystemSearchCompleted;
+                _fileSystemVisitor.FileSystemSearchCompleted += HandleFileSystemSearchCompletedStatusStrip;
             }
             else
             {
-                if (string.IsNullOrEmpty(resultsForLabel.Text))
-                    resultsForLabel.Text = $"Results for: {_currentFolderToSearchText}";
+                _fileSystemVisitor.FileSystemSearchStarted -= HandleFileSystemSearchStartedTriggeredByBrowseButton;
+                _fileSystemVisitor.FileSystemSearchStarted -= HandleFileSystemSearchStarted;
+                _fileSystemVisitor.FileSystemSearchCompleted -= HandleFileSystemSearchCompletedTriggeredByBrowseButton;
+                _fileSystemVisitor.FileSystemSearchCompleted -= HandleFileSystemSearchCompleted;
+                _fileSystemVisitor.FileSystemSearchCompleted -= HandleFileSystemSearchCompletedStatusStrip;
             }
         }
 
-        private void AddRemoveSearchStatusRelatedHandlers(bool add)
+        private void AddRemoveExpandSearchStatusRelatedHandlers(bool add)
         {
             if (add)
             {

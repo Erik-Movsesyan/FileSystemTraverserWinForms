@@ -1,4 +1,5 @@
 ﻿using FileSystemTraverser.Core;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -34,7 +35,6 @@ namespace FileSystemTraverserWinForms
         {
             folderToSearchBox = new TextBox();
             searchButton = new Button();
-            listBox = new ListBox();
             resultsForLabel = new Label();
             folderToSearchValidationMessageBox = new Label();
             statusStrip1 = new StatusStrip();
@@ -43,6 +43,9 @@ namespace FileSystemTraverserWinForms
             applyFilterCheckbox = new CheckBox();
             filterTextBoxValidationBox = new Label();
             abortSearchButton = new Button();
+            browseButton = new Button();
+            selectFolderToSearchDialog = new FolderBrowserDialog();
+            resultsTree = new TreeView();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -52,7 +55,7 @@ namespace FileSystemTraverserWinForms
             folderToSearchBox.Multiline = true;
             folderToSearchBox.Name = "folderToSearchBox";
             folderToSearchBox.PlaceholderText = "Which folder do you want to search?";
-            folderToSearchBox.Size = new Size(746, 41);
+            folderToSearchBox.Size = new Size(628, 41);
             folderToSearchBox.TabIndex = 1;
             folderToSearchBox.TabStop = false;
             folderToSearchBox.WordWrap = false;
@@ -68,18 +71,6 @@ namespace FileSystemTraverserWinForms
             searchButton.Text = "Search";
             searchButton.UseVisualStyleBackColor = true;
             searchButton.Click += HandleSearchButtonClick;
-            // 
-            // listBox
-            // 
-            listBox.FormattingEnabled = true;
-            listBox.HorizontalScrollbar = true;
-            listBox.ItemHeight = 28;
-            listBox.Location = new Point(86, 240);
-            listBox.Name = "listBox";
-            listBox.SelectionMode = SelectionMode.MultiExtended;
-            listBox.Size = new Size(881, 508);
-            listBox.TabIndex = 3;
-            listBox.MouseUp += HandleListBoxMouseUp;
             // 
             // resultsForLabel
             // 
@@ -161,11 +152,39 @@ namespace FileSystemTraverserWinForms
             abortSearchButton.UseVisualStyleBackColor = true;
             abortSearchButton.Click += HandleAbortSearchButtonClick;
             // 
+            // browseButton
+            // 
+            browseButton.Location = new Point(720, 65);
+            browseButton.Name = "browseButton";
+            browseButton.Size = new Size(112, 41);
+            browseButton.TabIndex = 11;
+            browseButton.Text = "Browse";
+            browseButton.UseVisualStyleBackColor = true;
+            browseButton.Click += HandleBrowseButtonClick;
+            // 
+            // selectFolderToSearchDialog
+            // 
+            selectFolderToSearchDialog.Description = "Select a folder to search";
+            selectFolderToSearchDialog.ShowHiddenFiles = true;
+            // 
+            // resultsTree
+            // 
+            resultsTree.Indent = 25;
+            resultsTree.Location = new Point(86, 249);
+            resultsTree.Name = "resultsTree";
+            resultsTree.Size = new Size(881, 482);
+            resultsTree.TabIndex = 12;
+            resultsTree.BeforeCollapse += HandleResultsTreeNodeBeforeCollapse;
+            resultsTree.BeforeExpand += HandleResultsTreeNodeBeforeExpand;
+            resultsTree.AfterExpand += HandleResultsTreeNodeExpanded;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(11F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1063, 833);
+            Controls.Add(resultsTree);
+            Controls.Add(browseButton);
             Controls.Add(abortSearchButton);
             Controls.Add(filterTextBoxValidationBox);
             Controls.Add(applyFilterCheckbox);
@@ -173,7 +192,6 @@ namespace FileSystemTraverserWinForms
             Controls.Add(statusStrip1);
             Controls.Add(folderToSearchValidationMessageBox);
             Controls.Add(resultsForLabel);
-            Controls.Add(listBox);
             Controls.Add(searchButton);
             Controls.Add(folderToSearchBox);
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -190,7 +208,6 @@ namespace FileSystemTraverserWinForms
         #endregion
         private TextBox folderToSearchBox;
         private Button searchButton;
-        private ListBox listBox;
         private Label resultsForLabel;
         private Label folderToSearchValidationMessageBox;
         private StatusStrip statusStrip1;
@@ -199,5 +216,8 @@ namespace FileSystemTraverserWinForms
         private CheckBox applyFilterCheckbox;
         private Label filterTextBoxValidationBox;
         private Button abortSearchButton;
+        private Button browseButton;
+        private FolderBrowserDialog selectFolderToSearchDialog;
+        private TreeView resultsTree;
     }
 }

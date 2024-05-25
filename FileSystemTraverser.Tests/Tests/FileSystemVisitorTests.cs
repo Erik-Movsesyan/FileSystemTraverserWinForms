@@ -32,7 +32,7 @@ namespace FileSystemTraverser.Tests.FileSystemVisitorTests
                 .Select(fileSystemInfo => fileSystemInfo.ToFileSystemEntry(File.Exists(fileSystemInfo.FullName)));
 
             //Act
-            await _fileSystemVisitor.StartFileSystemSearch(testDataFolderFilesOnlyRelativePath, CancellationToken.None);
+            await _fileSystemVisitor.StartFileSystemSearch(testDataFolderFilesOnlyRelativePath, null, CancellationToken.None);
             var actualFileSystemEntries = _fileSystemVisitor.ToList();
 
             //Assert
@@ -47,13 +47,12 @@ namespace FileSystemTraverser.Tests.FileSystemVisitorTests
             var testDataFolderFilesAndDirectoriesPath = new DirectoryInfo(testDataFolderFilesAndDirectoriesRelativePath).FullName;
             var expectedFileSystemEntries = new List<FileSystemEntry>
             {
-                new("TestFile1.txt", true, Path.Combine(testDataFolderFilesAndDirectoriesPath, @"Dir\TestFile1.txt")),
                 new("Dir", false, Path.Combine(testDataFolderFilesAndDirectoriesPath, @"Dir")),
                 new("TestFile2.txt", true, Path.Combine(testDataFolderFilesAndDirectoriesPath, @"TestFile2.txt"))
             };
 
             //Act
-            await _fileSystemVisitor.StartFileSystemSearch(testDataFolderFilesAndDirectoriesPath, CancellationToken.None);
+            await _fileSystemVisitor.StartFileSystemSearch(testDataFolderFilesAndDirectoriesPath, null, CancellationToken.None);
             var actualFileSystemEntries = _fileSystemVisitor.ToList();
 
             //Assert
@@ -72,7 +71,7 @@ namespace FileSystemTraverser.Tests.FileSystemVisitorTests
                 .Select(fileSystemInfo => fileSystemInfo.ToFileSystemEntry(File.Exists(fileSystemInfo.FullName)));
 
             //Act
-            await _fileSystemVisitor.StartFilteredFileSystemSearch(testDataFolderFilesOnlyRelativePath, filter, CancellationToken.None);
+            await _fileSystemVisitor.StartFilteredFileSystemSearch(testDataFolderFilesOnlyRelativePath, filter, null, CancellationToken.None);
             var actualFileSystemEntries = _fileSystemVisitor.ToList();
 
             //Assert
@@ -89,12 +88,11 @@ namespace FileSystemTraverser.Tests.FileSystemVisitorTests
 
             var expectedFileSystemEntries = new List<FileSystemEntry>
             {
-                new("TestFile1.txt", true, Path.Combine(testDataFolderFilesAndDirectoriesPath, @"Dir\TestFile1.txt")),
                 new("TestFile2.txt", true, Path.Combine(testDataFolderFilesAndDirectoriesPath, @"TestFile2.txt"))
             };
 
             //Act
-            await _fileSystemVisitor.StartFilteredFileSystemSearch(testDataFolderFilesAndDirectoriesPath, filter, CancellationToken.None);
+            await _fileSystemVisitor.StartFilteredFileSystemSearch(testDataFolderFilesAndDirectoriesPath, filter, null, CancellationToken.None);
             var actualFileSystemEntries = _fileSystemVisitor.ToList();
 
             //Assert
@@ -102,33 +100,33 @@ namespace FileSystemTraverser.Tests.FileSystemVisitorTests
         }
 
         [Test, TestCaseSource(nameof(YieldEventEventRelatedTestData))]
-        public async Task Template_For_YieldEventEventRelatedTestData_TestCaseSource(EventHandler eventHandler)
+        public async Task Template_For_YieldEventEventRelatedTestData_TestCaseSource(EventHandler eventHandler, string eventName)
         {
             //Arrange
             var testDataFolderFilesOnlyRelativePath = Path.Combine(_testDataFolderRelativeToCurrentDomainFolder, "TestDataFolderFilesOnly");
             _fileSystemVisitor.FileSystemSearchStarted += eventHandler;
 
             //Act
-            await _fileSystemVisitor.StartFileSystemSearch(testDataFolderFilesOnlyRelativePath, CancellationToken.None);
+            await _fileSystemVisitor.StartFileSystemSearch(testDataFolderFilesOnlyRelativePath, null, CancellationToken.None);
 
             //Assert
-            Assert.Fail($"The '{nameof(_fileSystemVisitor.FilteredDirectoryFound)}' event did not fire since the subscribed handler: " +
-                        $"'{nameof(eventHandler)}' was not invoked");
+            Assert.Fail($"The '{eventName}' event did not fire since the subscribed handler: " +
+                        $"'{eventHandler.Method.Name}' was not invoked");
         }
 
         private static IEnumerable<TestCaseData> YieldEventEventRelatedTestData()
         {
-            yield return new TestCaseData((EventHandler)HandleFileSystemSearchStarted)
+            yield return new TestCaseData((EventHandler)HandleFileSystemSearchStarted, nameof(_fileSystemVisitor.FileSystemSearchStarted))
                 .SetName("Test_FileSystemSearchStared_Event_Fired");
-            yield return new TestCaseData((EventHandler)HandleFileSystemSearchCompleted)
+            yield return new TestCaseData((EventHandler)HandleFileSystemSearchCompleted, nameof(_fileSystemVisitor.FileSystemSearchCompleted))
                 .SetName("Test_FileSystemSearchCompleted_Event_Fired");
-            yield return new TestCaseData((EventHandler)HandleFileFound)
+            yield return new TestCaseData((EventHandler)HandleFileFound, nameof(_fileSystemVisitor.FileFound))
                 .SetName("Test_FileFound_Event_Fired");
-            yield return new TestCaseData((EventHandler)HandleDirectoryFound)
+            yield return new TestCaseData((EventHandler)HandleDirectoryFound, nameof(_fileSystemVisitor.DirectoryFound))
                 .SetName("Test_DirectoryFound_Event_Fired");
-            yield return new TestCaseData((EventHandler)HandleFilteredFileFound)
+            yield return new TestCaseData((EventHandler)HandleFilteredFileFound, nameof(_fileSystemVisitor.FilteredFileFound))
                 .SetName("Test_FilteredFileFound_Event_Fired");
-            yield return new TestCaseData((EventHandler)HandleFilteredDirectoryFound)
+            yield return new TestCaseData((EventHandler)HandleFilteredDirectoryFound, nameof(_fileSystemVisitor.FilteredDirectoryFound))
                 .SetName("Test_FilteredDirectoryFound_Event_Fired");
         }
     }
